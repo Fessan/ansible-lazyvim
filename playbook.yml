@@ -1,0 +1,38 @@
+- hosts: all
+  become: yes
+  gather_facts: no
+  vars:
+    username: fessan
+  tasks:
+    - name: Установка snap
+      apt:
+        name: snapd
+        state: present
+
+    - name: Установка nvim через snap
+      community.general.snap:
+        name: nvim
+        classic: true
+
+    - name: Удаление существующего каталога
+      file:
+        path: "/home/{{ username }}/.config/nvim"
+        state: absent
+
+    - name: Клонирование репозитория LazyVim
+      git:
+        repo: 'https://github.com/LazyVim/starter'
+        dest: "/home/{{ username }}/.config/nvim"
+
+    - name: Изменение владельца и группы каталога
+      file:
+        path: "/home/{{ username }}/.config/nvim"
+        owner: "{{ username }}"
+        group: "{{ username }}"
+        recurse: yes
+
+    - name: Удаление папки .git
+      file:
+        path: "/home/{{ username }}/.config/nvim/.git"
+        state: absent
+
